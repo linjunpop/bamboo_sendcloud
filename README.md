@@ -1,6 +1,6 @@
-# Bamboo.Sendcloud
+# Bamboo.SendcloudAdapter
 
-**TODO: Add description**
+A [Sendcloud](https://www.sendcloud.net) adapter for the [Bamboo](https://github.com/thoughtbot/bamboo).
 
 ## Installation
 
@@ -11,6 +11,15 @@ by adding `bamboo_sendcloud` to your list of dependencies in `mix.exs`:
 def deps do
   [{:bamboo_sendcloud, "~> 0.1.0"}]
 end
+```
+
+In `config/config.exs`, or `config.prod.exs`, etc.
+
+```elixir
+config :my_app, MyApp.Mailer,
+  adapter: Bamboo.SendcloudAdapter,
+  api_user: "my_api_user",
+  api_key: "my_api_key"
 ```
 
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
