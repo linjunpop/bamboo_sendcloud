@@ -1,10 +1,15 @@
 defmodule BambooSendcloudAdapterTest do
-  use ExUnit.Case
+  use ExUnit.Case,async: false
+  use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
 
   alias Bamboo.Email
   alias Bamboo.SendcloudAdapter
 
-  @config %{adapter: SendcloudAdapter, api_user: "", api_key: ""}
+  @config %{adapter: SendcloudAdapter, api_user: "test", api_key: "test"}
+
+  setup_all do
+    :ok
+  end
 
   test "deliver/2 sends from, html and text body, subject, and headers" do
     email = new_email(
@@ -14,11 +19,13 @@ defmodule BambooSendcloudAdapterTest do
     )
     |> Email.put_header("Reply-To", "reply@example.com")
 
-    result =
-      email
-      |> SendcloudAdapter.deliver(@config)
+    use_cassette "success_sample" do
+      result =
+        email
+        |> SendcloudAdapter.deliver(@config)
 
-    assert {:ok, info} = result
+      assert {:ok, info} = result
+    end
   end
 
   defp new_email(attrs \\ []) do

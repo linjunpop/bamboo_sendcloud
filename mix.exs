@@ -1,20 +1,26 @@
 defmodule Bamboo.Sendcloud.Mixfile do
   use Mix.Project
 
+  @version "0.1.0"
   @project_url "https://github.com/linjunpop/bamboo_sendcloud"
 
   def project do
-    [app: :bamboo_sendcloud,
-     version: "0.1.0",
-     elixir: "~> 1.4",
-     source_url: @project_url,
-     homepage_url: @project_url,
-     name: "Bamboo Sendcloud Adapter",
-     description: "A Bamboo adapter for Sendcloud",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     package: package(),
-     deps: deps()]
+    [
+      app: :bamboo_sendcloud,
+      version: @version,
+      elixir: "~> 1.4",
+      source_url: @project_url,
+      homepage_url: @project_url,
+      name: "Bamboo Sendcloud Adapter",
+      description: "A Bamboo adapter for Sendcloud",
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      package: package(),
+      deps: deps(),
+      preferred_cli_env: [
+        vcr: :test, "vcr.delete": :test, "vcr.check": :test, "vcr.show": :test
+      ],
+    ]
   end
 
   # Configuration for the OTP application
@@ -42,7 +48,8 @@ defmodule Bamboo.Sendcloud.Mixfile do
       {:plug, "~> 1.0"},
       {:cowboy, "~> 1.0", only: [:test, :dev]},
       {:ex_doc, "~> 0.13", only: :dev},
-      {:credo, "~> 0.7", only: [:dev, :test]}
+      {:credo, "~> 0.7", only: [:dev, :test]},
+      {:exvcr, "~> 0.8", only: :test}
     ]
   end
 
