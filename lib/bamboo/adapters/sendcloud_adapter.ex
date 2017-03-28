@@ -1,7 +1,27 @@
 defmodule Bamboo.SendcloudAdapter do
+  @moduledoc """
+  Sends email using Sendcloud’s API.
+
+  Use this adapter to send emails through Sendcloud’s API.
+  Requires an API user and an API key are set in the config.
+
+  ## Example config
+
+      # In config/config.exs, or config.prod.exs, etc.
+      config :my_app, MyApp.Mailer,
+        adapter: Bamboo.SendcloudAdapter,
+        api_user: "my_api_user",
+        api_key: "my_api_key"
+
+      # Define a Mailer. Maybe in lib/my_app/mailer.ex
+      defmodule MyApp.Mailer do
+        use Bamboo.Mailer, otp_app: :my_app
+      end
+  """
   @behaviour Bamboo.Adapter
 
   @base_uri "http://api.sendcloud.net/apiv2"
+  @send_email_uri @base_uri <> "/mail/send"
 
   alias Bamboo.Email
 
@@ -69,8 +89,8 @@ defmodule Bamboo.SendcloudAdapter do
     end
   end
 
-  def do_request(body, config) do
-    uri = full_uri()
+  defp do_request(body, config) do
+    uri = @send_email_uri
 
     headers = [
       {"Content-Type", "application/x-www-form-urlencoded"},
@@ -174,7 +194,6 @@ defmodule Bamboo.SendcloudAdapter do
     |> Enum.map(&do_transform_email/1)
     |> Enum.join(";")
   end
-
   defp do_transform_email({_name, email}) do
     # Sendcloud does not allow name in email address.
     email
@@ -194,14 +213,9 @@ defmodule Bamboo.SendcloudAdapter do
 
   @sendcloud_message_fields ~w(from to cc bcc subject plain html headers)a
 
-  def filter_non_empty_sendcloud_fields(map) do
+  defp filter_non_empty_sendcloud_fields(map) do
     Enum.filter(map, fn({key, value}) ->
-      # Key is a well known sendcloud field or is an header field and its value is not empty
       (key in @sendcloud_message_fields) && !(value in [nil, "", []])
     end)
-  end
-
-  defp full_uri do
-    Application.get_env(:bamboo, :sendcloud_base_uri, @base_uri) <> "/mail/send"
   end
 end
