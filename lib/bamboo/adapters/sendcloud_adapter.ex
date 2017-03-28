@@ -82,7 +82,7 @@ defmodule Bamboo.SendcloudAdapter do
     {:ok, json} = do_request(body, config)
 
     case json do
-      %{"info" => info, "message" => "请求成功", "result" => true, "statusCode" => 200} ->
+      %{"info" => info, "message" => _, "result" => true, "statusCode" => 200} ->
         {:ok, info}
       %{"message" => msg, "result" => false, "statusCode" => code} ->
         raise(ApiError, {:sendcloud, %{message: msg, code: code}})
