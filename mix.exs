@@ -41,7 +41,8 @@ defmodule Bamboo.Sendcloud.Mixfile do
       {:poison, ">= 1.5.0"},
       {:plug, "~> 1.0"},
       {:cowboy, "~> 1.0", only: [:test, :dev]},
-      {:ex_doc, "~> 0.13", only: :dev}
+      {:ex_doc, "~> 0.13", only: :dev},
+      {:credo, "~> 0.7", only: [:dev, :test]}
     ]
   end
 
