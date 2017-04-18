@@ -1,0 +1,27 @@
+[
+  {
+    "request": {
+      "body": "apiKey=test&apiUser=test&from=Test+From%3Ctest%40test.sendcloud.org%3E&headers=%7B%7D&subject=Active&templateInvokeName=test_template_active&to=jun%40example.com&xsmtpapi=%7B%22to%22%3A%5B%22jun%40example.com%22%5D%2C%22sub%22%3A%7B%22%25name%25%22%3A%5B%5B104%2C101%2C108%2C108%2C111%5D%5D%7D%7D",
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "method": "post",
+      "options": {
+        "with_body": true
+      },
+      "request_body": "",
+      "url": "http://api.sendcloud.net/apiv2/mail/sendtemplate"
+    },
+    "response": {
+      "body": "{\"result\":true,\"statusCode\":200,\"message\":\"请求成功\",\"info\":{\"emailIdList\":[\"1492403489876_27290_9913_8376.sc-10_9_51_120-inbound0$jun@example.com\"]}}",
+      "headers": {
+        "Server": "nginx/1.6.3",
+        "Date": "Mon, 17 Apr 2017 04:31:29 GMT",
+        "Content-Type": "application/json;charset=UTF-8",
+        "Transfer-Encoding": "chunked"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

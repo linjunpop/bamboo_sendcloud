@@ -22,64 +22,20 @@ defmodule Bamboo.SendcloudAdapter do
 
   @base_uri "http://api.sendcloud.net/apiv2"
   @send_email_uri @base_uri <> "/mail/send"
+  @send_template_email_uri @base_uri <> "/mail/sendtemplate"
 
   alias Bamboo.Email
-
-  defmodule ApiError do
-    defexception [:message]
-
-    def exception({:plain, %{message: message}}) do
-      %ApiError{message: message}
-    end
-    def exception({:http, %{req_body: req_body, response: response}}) do
-      filtered_params =
-        req_body
-        |> Enum.into(%{})
-
-      message = """
-      There was a problem sending the email through the Sendcloud API.
-
-      Here is the response:
-
-      #{inspect response, limit: :infinity}
-
-      Here are the params we sent:
-
-      #{inspect filtered_params, pretty: true, limit: :infinity}
-      """
-
-      %ApiError{message: message}
-    end
-    def exception(:json) do
-      message = """
-      There was a problem of parsing the response JSON from Sendcloud API.
-      """
-
-      %ApiError{message: message}
-    end
-    def exception({:sendcloud, %{message: msg, code: code}}) do
-      message = """
-      There was a problem sending the email through the Sendcloud API.
-
-      Error Code:
-
-      #{code}
-
-      Message:
-
-      #{msg}
-      """
-
-      %ApiError{message: message}
-    end
-  end
+  alias Bamboo.SendcloudAdapter.ApiError
 
   def deliver(email, config) do
     body =
       email
       |> to_sendcloud_body()
 
-    {:ok, json} = do_request(body, config)
+    uri =
+      api_uri(email)
+
+    {:ok, json} = do_request(uri, body, config)
 
     case json do
       %{"info" => info, "message" => _, "result" => true, "statusCode" => 200} ->
@@ -89,9 +45,7 @@ defmodule Bamboo.SendcloudAdapter do
     end
   end
 
-  defp do_request(body, config) do
-    uri = @send_email_uri
-
+  defp do_request(uri, body, config) do
     headers = [
       {"Content-Type", "application/x-www-form-urlencoded"},
     ]
@@ -144,7 +98,19 @@ defmodule Bamboo.SendcloudAdapter do
     |> Keyword.put(:apiKey, config.api_key)
   end
 
+  defp to_sendcloud_body(%Email{private: %{template_name: _, sub: _}} = email) do
+    # send template email
+    email
+    |> Map.from_struct
+    |> put_from(email)
+    |> put_to(email)
+    |> put_headers(email)
+    |> put_template_name(email)
+    |> put_xsmtpapi(email)
+    |> filter_non_empty_sendcloud_fields()
+  end
   defp to_sendcloud_body(%Email{} = email) do
+    # send standard email
     email
     |> Map.from_struct
     |> put_from(email)
@@ -211,7 +177,30 @@ defmodule Bamboo.SendcloudAdapter do
     Map.put(body, :headers, encoded)
   end
 
-  @sendcloud_message_fields ~w(from to cc bcc subject plain html headers)a
+  defp put_template_name(body, %Email{private: %{template_name: tpl_name, sub: _}}) do
+    body
+    |> Map.put(:templateInvokeName, tpl_name)
+  end
+
+  defp put_xsmtpapi(%{to: to} = body, %Email{private: %{template_name: tpl_name, sub: %{} = sub}}) do
+    content = %{
+      "to": [to],
+      "sub": sub
+    }
+    |> Poison.encode!()
+
+    body
+    |> Map.put(:xsmtpapi, content)
+  end
+
+  defp api_uri(%Email{private: %{template_name: _, sub: _}}) do
+    @send_template_email_uri
+  end
+  defp api_uri(%Email{}) do
+    @send_email_uri
+  end
+
+  @sendcloud_message_fields ~w(from to cc bcc subject plain html headers templateInvokeName xsmtpapi)a
 
   defp filter_non_empty_sendcloud_fields(map) do
     Enum.filter(map, fn({key, value}) ->
