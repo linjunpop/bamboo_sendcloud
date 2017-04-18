@@ -22,7 +22,35 @@ config :my_app, MyApp.Mailer,
   api_key: "my_api_key"
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/bamboo_sendcloud](https://hexdocs.pm/bamboo_sendcloud).
+## Usage
+
+### Send standard email
+
+```elixir
+import Bamboo.Email
+
+email =
+  new_email()
+  |> from({"Bender", "notify@send1.example.com"})
+  |> to(user)
+  |> subject("Welcome!")
+  |> text_body("Welcome to the app")
+  |> html_body("<strong>Welcome to the app</strong>")
+```
+
+### Send template email
+
+```elixir
+import Bamboo.Email
+
+email =
+  new_email()
+  |> from({"Bender", "notify@send1.example.com"})
+  |> to(user)
+  |> SendcloudHelper.template("reset_password", %{"%link%" => [reset_password_link]})
+```
+
+## Docs
+
+[https://hexdocs.pm/bamboo_sendcloud](https://hexdocs.pm/bamboo_sendcloud).
 
