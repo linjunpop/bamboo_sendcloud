@@ -182,7 +182,7 @@ defmodule Bamboo.SendcloudAdapter do
     |> Map.put(:templateInvokeName, tpl_name)
   end
 
-  defp put_xsmtpapi(%{to: to} = body, %Email{private: %{template_name: tpl_name, sub: %{} = sub}}) do
+  defp put_xsmtpapi(%{to: to} = body, %Email{private: %{template_name: _, sub: %{} = sub}}) do
     content = %{
       "to": [to],
       "sub": sub
