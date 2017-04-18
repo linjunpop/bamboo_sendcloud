@@ -1,7 +1,7 @@
 defmodule Bamboo.Sendcloud.Mixfile do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.2.0"
   @project_url "https://github.com/linjunpop/bamboo_sendcloud"
 
   def project do

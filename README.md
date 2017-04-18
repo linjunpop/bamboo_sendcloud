@@ -9,7 +9,7 @@ by adding `bamboo_sendcloud` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:bamboo_sendcloud, "~> 0.1.0"}]
+  [{:bamboo_sendcloud, "~> 0.2.0"}]
 end
 ```
 
