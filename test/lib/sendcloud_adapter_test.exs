@@ -25,7 +25,7 @@ defmodule Bamboo.SendcloudAdapterTest do
         email
         |> SendcloudAdapter.deliver(@config)
 
-      assert {:ok, info} = result
+      assert {:ok, _info} = result
     end
   end
 
@@ -39,7 +39,7 @@ defmodule Bamboo.SendcloudAdapterTest do
         email
         |> SendcloudAdapter.deliver(@config)
 
-      assert {:ok, info} = result
+      assert {:ok, _info} = result
     end
   end
 
