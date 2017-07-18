@@ -5,7 +5,7 @@ defmodule Bamboo.SendcloudHelper do
 
   alias Bamboo.Email
 
-  def template(email, template_name, sub \\ []) do
+  def template(email, template_name, sub \\ %{}) do
     email
     |> Email.put_private(:template_name, template_name)
     |> Email.put_private(:sub, sub)
