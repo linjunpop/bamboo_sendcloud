@@ -32,14 +32,14 @@ defmodule Bamboo.SendcloudAdapter do
       email
       |> to_sendcloud_body()
 
-    uri =
-      api_uri(email)
+    uri = api_uri(email)
 
     {:ok, json} = do_request(uri, body, config)
 
     case json do
       %{"info" => info, "message" => _, "result" => true, "statusCode" => 200} ->
         {:ok, info}
+
       %{"message" => msg, "result" => false, "statusCode" => code} ->
         raise(ApiError, {:sendcloud, %{message: msg, code: code}})
     end
@@ -47,26 +47,27 @@ defmodule Bamboo.SendcloudAdapter do
 
   defp do_request(uri, body, config) do
     headers = [
-      {"Content-Type", "application/x-www-form-urlencoded"},
+      {"Content-Type", "application/x-www-form-urlencoded"}
     ]
 
     encoded_body =
       body
       |> append_auth_info(config)
-      |> Plug.Conn.Query.encode
+      |> Plug.Conn.Query.encode()
 
-    with(
-      {:ok, 200, _headers, response} <- :hackney.post(uri, headers, encoded_body, [:with_body]),
-      {:ok, json} <- Poison.decode(response)
-    ) do
+    with {:ok, 200, _headers, response} <- :hackney.post(uri, headers, encoded_body, [:with_body]),
+         {:ok, json} <- Poison.decode(response) do
       {:ok, json}
     else
       {:ok, _status, _headers, response} ->
         raise(ApiError, {:http, %{req_body: body, response: response}})
+
       {:error, :invalid} ->
         raise(ApiError, :json)
+
       {:error, {:invalid, _}} ->
         raise(ApiError, :json)
+
       {:error, reason} ->
         raise(ApiError, {:plain, %{message: inspect(reason)}})
     end
@@ -79,6 +80,7 @@ defmodule Bamboo.SendcloudAdapter do
         raise_missing_setting_error(config, setting)
       end
     end
+
     config
   end
 
@@ -88,7 +90,7 @@ defmodule Bamboo.SendcloudAdapter do
 
     Here are the config options that were passed in:
 
-    #{inspect config}
+    #{inspect(config)}
     """
   end
 
@@ -101,7 +103,7 @@ defmodule Bamboo.SendcloudAdapter do
   defp to_sendcloud_body(%Email{private: %{template_name: _, sub: _}} = email) do
     # send template email
     email
-    |> Map.from_struct
+    |> Map.from_struct()
     |> put_from(email)
     |> put_to(email)
     |> put_headers(email)
@@ -109,10 +111,11 @@ defmodule Bamboo.SendcloudAdapter do
     |> put_xsmtpapi(email)
     |> filter_non_empty_sendcloud_fields()
   end
+
   defp to_sendcloud_body(%Email{} = email) do
     # send standard email
     email
-    |> Map.from_struct
+    |> Map.from_struct()
     |> put_from(email)
     |> put_to(email)
     |> put_cc(email)
@@ -160,6 +163,7 @@ defmodule Bamboo.SendcloudAdapter do
     |> Enum.map(&do_transform_email/1)
     |> Enum.join(";")
   end
+
   defp do_transform_email({_name, email}) do
     # Sendcloud does not allow name in email address.
     email
@@ -172,7 +176,7 @@ defmodule Bamboo.SendcloudAdapter do
   defp put_headers(body, %Email{headers: headers}) do
     encoded =
       headers
-      |> Poison.encode!
+      |> Poison.encode!()
 
     Map.put(body, :headers, encoded)
   end
@@ -183,11 +187,12 @@ defmodule Bamboo.SendcloudAdapter do
   end
 
   defp put_xsmtpapi(%{to: to} = body, %Email{private: %{template_name: _, sub: %{} = sub}}) do
-    content = %{
-      "to": [to],
-      "sub": sub
-    }
-    |> Poison.encode!()
+    content =
+      %{
+        to: [to],
+        sub: sub
+      }
+      |> Poison.encode!()
 
     body
     |> Map.put(:xsmtpapi, content)
@@ -196,6 +201,7 @@ defmodule Bamboo.SendcloudAdapter do
   defp api_uri(%Email{private: %{template_name: _, sub: _}}) do
     @send_template_email_uri
   end
+
   defp api_uri(%Email{}) do
     @send_email_uri
   end
@@ -203,8 +209,8 @@ defmodule Bamboo.SendcloudAdapter do
   @sendcloud_message_fields ~w(from to cc bcc subject plain html headers templateInvokeName xsmtpapi)a
 
   defp filter_non_empty_sendcloud_fields(map) do
-    Enum.filter(map, fn({key, value}) ->
-      (key in @sendcloud_message_fields) && !(value in [nil, "", []])
+    Enum.filter(map, fn {key, value} ->
+      key in @sendcloud_message_fields && !(value in [nil, "", []])
     end)
   end
 end

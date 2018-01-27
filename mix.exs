@@ -13,13 +13,16 @@ defmodule Bamboo.Sendcloud.Mixfile do
       homepage_url: @project_url,
       name: "Bamboo Sendcloud Adapter",
       description: "A Bamboo adapter for Sendcloud",
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       package: package(),
       deps: deps(),
       preferred_cli_env: [
-        vcr: :test, "vcr.delete": :test, "vcr.check": :test, "vcr.show": :test
-      ],
+        vcr: :test,
+        "vcr.delete": :test,
+        "vcr.check": :test,
+        "vcr.show": :test
+      ]
     ]
   end
 

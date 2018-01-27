@@ -4,6 +4,7 @@ defmodule Bamboo.SendcloudAdapter.ApiError do
   def exception({:plain, %{message: message}}) do
     %__MODULE__{message: message}
   end
+
   def exception({:http, %{req_body: req_body, response: response}}) do
     filtered_params =
       req_body
@@ -14,15 +15,16 @@ defmodule Bamboo.SendcloudAdapter.ApiError do
 
     Here is the response:
 
-    #{inspect response, limit: :infinity}
+    #{inspect(response, limit: :infinity)}
 
     Here are the params we sent:
 
-    #{inspect filtered_params, pretty: true, limit: :infinity}
+    #{inspect(filtered_params, pretty: true, limit: :infinity)}
     """
 
     %__MODULE__{message: message}
   end
+
   def exception(:json) do
     message = """
     There was a problem of parsing the response JSON from Sendcloud API.
@@ -30,6 +32,7 @@ defmodule Bamboo.SendcloudAdapter.ApiError do
 
     %__MODULE__{message: message}
   end
+
   def exception({:sendcloud, %{message: msg, code: code}}) do
     message = """
     There was a problem sending the email through the Sendcloud API.
